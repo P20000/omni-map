@@ -1,5 +1,5 @@
 # Stage 1: Build the React Frontend
-FROM node:20-alpine AS build-stage
+FROM node:20-slim AS build-stage
 WORKDIR /app/client
 COPY client/package*.json ./
 RUN npm install
@@ -7,7 +7,7 @@ COPY client/ ./
 RUN npm run build
 
 # Stage 2: Setup the Node.js Backend
-FROM node:20-alpine
+FROM node:20-slim
 WORKDIR /app
 COPY server/package*.json ./server/
 RUN cd server && npm install
