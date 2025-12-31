@@ -20,7 +20,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 // Pages
 import Dashboard from "./pages/Dashboard";
 import EditorPage from "./pages/EditorPage";
-import VaultPage from "./pages/VaultPage"; // Ensure file name matches casing
+import VaultPage from "./pages/VaultPage"; // Ensure file name matches casing.
 import ProjectSelectionPage from "./pages/ProjectSelectionPage";
 
 const drawerWidth = 260;
