@@ -20,7 +20,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 // Pages
 import Dashboard from "./pages/Dashboard";
 import EditorPage from "./pages/EditorPage";
-import VaultPage from "./pages/VaultPage"; // Ensure file name matches casing.
+import Vaultpage from "./pages/Vaultpage"; // Ensure file name matches casing. .
 import ProjectSelectionPage from "./pages/ProjectSelectionPage";
 
 const drawerWidth = 260;
@@ -113,7 +113,7 @@ function App() {
         <Box sx={{ p: 4, flexGrow: 1 }}>
             {activeTab === 0 && <Dashboard projectId={currentProject.id} />}
             {activeTab === 1 && <EditorPage projectId={currentProject.id} />}
-            {activeTab === 2 && <VaultPage projectId={currentProject.id} />}
+            {activeTab === 2 && <Vaultpage projectId={currentProject.id} />}
         </Box>
 
       </Box>
