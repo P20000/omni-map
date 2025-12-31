@@ -1,75 +1,122 @@
-import React, { useState, useEffect } from "react";
-import { Box, AppBar, Toolbar, Typography, Container, Grid, Button } from "@mui/material";
-import HubIcon from "@mui/icons-material/Hub";
-import AccountTreeIcon from "@mui/icons-material/AccountTree";
-import BoltIcon from "@mui/icons-material/Bolt";
-import SpeedIcon from "@mui/icons-material/Speed";
-import RefreshIcon from '@mui/icons-material/Refresh';
+import React, { useState } from "react";
+import { 
+  Box, 
+  CssBaseline, 
+  Toolbar, 
+  Drawer, 
+  Typography, 
+  Tabs, 
+  Button, 
+  Tab 
+} from "@mui/material";
 
-import StatCard from "./components/dashboard/StatCards";
-import ActivityTimeline from "./components/dashboard/ActivityTimeline";
+// Icons
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import HubIcon from "@mui/icons-material/Hub";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
+// Pages
+import Dashboard from "./pages/Dashboard";
+import EditorPage from "./pages/EditorPage";
+import VaultPage from "./pages/VaultPage"; // Ensure file name matches casing
+import ProjectSelectionPage from "./pages/ProjectSelectionPage";
+
+const drawerWidth = 260;
 
 function App() {
-  const [stats, setStats] = useState({ nodes: null, health: null, speed: null });
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // State to manage navigation and project scope
+  const [currentProject, setCurrentProject] = useState(null); 
+  const [activeTab, setActiveTab] = useState(0);
 
-  // REAL API CALL
-  const fetchDashboardData = async () => {
-    setLoading(true);
-    try {
-      const statsRes = await fetch("http://localhost:5000/api/dashboard/stats");
-      const statsData = await statsRes.json();
-      
-      const eventsRes = await fetch("http://localhost:5000/api/dashboard/events");
-      const eventsData = await eventsRes.json();
-
-      setStats(statsData);
-      setEvents(eventsData);
-    } catch (error) {
-      console.error("Failed to fetch data from Omni-Server:", error);
-    } finally {
-      setLoading(false);
-    }
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
   };
 
+  // IF NO PROJECT SELECTED -> SHOW LOBBY
+  if (!currentProject) {
+    return (
+      <>
+        <CssBaseline />
+        <ProjectSelectionPage onSelectProject={setCurrentProject} />
+      </>
+    );
+  }
+
+  // IF PROJECT SELECTED -> SHOW MAIN UI
   return (
-    <Box sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "background.default", color: "text.primary" }}>
-      <AppBar position="static" color="transparent" elevation={0} sx={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <HubIcon sx={{ mr: 2, color: "primary.main" }} />
-            <Typography variant="h6" sx={{ fontWeight: "bold", letterSpacing: "1px" }}>OMNI-MAP</Typography>
-          </Box>
-          <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchDashboardData} size="small">
-            Sync Real Data
-          </Button>
-        </Toolbar>
-      </AppBar>
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default" }}>
+      <CssBaseline />
       
-      <Container maxWidth="lg" sx={{ mt: 6 }}>
-        <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold" }}>Mission Control</Typography>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <StatCard title="Active Nodes" value={stats.nodes} icon={AccountTreeIcon} color="#7c4dff" loading={loading} />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <StatCard title="System Health" value={stats.health} icon={BoltIcon} color="#00e5ff" loading={loading} />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <StatCard title="Avg. Deployment" value={stats.speed} icon={SpeedIcon} color="#4caf50" loading={loading} />
-          </Grid>
-          <Grid item xs={12} md={8}>
-             <Box sx={{ p: 4, height: '400px', borderRadius: 3, bgcolor: 'background.paper', border: '1px dashed rgba(124, 77, 255, 0.2)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <Typography color="textSecondary" variant="h6">Infrastructure Map</Typography>
-                <Typography color="textSecondary" variant="body2">Waiting for connection...</Typography>
-             </Box>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <ActivityTimeline events={events} />
-          </Grid>
-        </Grid>
-      </Container>
+      {/* Sidebar: Persistent Brand & Info */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: { 
+            width: drawerWidth, 
+            boxSizing: "border-box", 
+            bgcolor: "background.paper", 
+            borderRight: "1px solid rgba(255,255,255,0.05)" 
+          },
+        }}
+      >
+        <Toolbar sx={{ mt: 1 }}>
+          <HubIcon sx={{ mr: 2, color: "primary.main" }} />
+          <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: "1px" }}>
+            OMNI-MAP
+          </Typography>
+        </Toolbar>
+
+        {/* Project Info Card in Sidebar */}
+        <Box sx={{ p: 3 }}>
+          <Box sx={{ p: 2, bgcolor: 'rgba(124, 77, 255, 0.08)', borderRadius: 2, border: '1px solid rgba(124, 77, 255, 0.1)' }}>
+            <Typography variant="caption" color="primary" sx={{ fontWeight: 700, textTransform: 'uppercase' }}>
+              Current Architecture
+            </Typography>
+            <Typography variant="body1" sx={{ fontWeight: 600, mt: 0.5 }}>
+              {currentProject.name}
+            </Typography>
+            <Button 
+              size="small" 
+              startIcon={<ArrowBackIcon />} 
+              sx={{ mt: 1, p: 0, textTransform: 'none', color: 'text.secondary' }}
+              onClick={() => setCurrentProject(null)} // Go back to lobby
+            >
+              Switch Project
+            </Button>
+          </Box>
+        </Box>
+      </Drawer>
+
+      {/* Main Content Area */}
+      <Box component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        
+        {/* Navigation Tabs Bar */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper', position: 'sticky', top: 0, zIndex: 10 }}>
+          <Tabs 
+            value={activeTab} 
+            onChange={handleTabChange} 
+            textColor="primary"
+            indicatorColor="primary"
+            sx={{ px: 3, pt: 1 }}
+          >
+            <Tab label="Mission Control" icon={<DashboardIcon fontSize="small" />} iconPosition="start" sx={{ minHeight: 64, fontWeight: 600 }} />
+            <Tab label="Omni-Editor" icon={<AccountTreeIcon fontSize="small" />} iconPosition="start" sx={{ minHeight: 64, fontWeight: 600 }} />
+            <Tab label="The Vault" icon={<VpnKeyIcon fontSize="small" />} iconPosition="start" sx={{ minHeight: 64, fontWeight: 600 }} />
+          </Tabs>
+        </Box>
+
+        {/* Tab Content Display */}
+        <Box sx={{ p: 4, flexGrow: 1 }}>
+            {activeTab === 0 && <Dashboard projectId={currentProject.id} />}
+            {activeTab === 1 && <EditorPage projectId={currentProject.id} />}
+            {activeTab === 2 && <VaultPage projectId={currentProject.id} />}
+        </Box>
+
+      </Box>
     </Box>
   );
 }
