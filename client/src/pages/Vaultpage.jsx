@@ -13,7 +13,7 @@ const VaultPage = ({ projectId }) => {
   const [formData, setFormData] = useState({ provider: "github", apiKey: "" });
   const [toast, setToast] = useState({ open: false, msg: "" });
 
-  // 1. Fetch current status from Backend -> Turso
+  // 1. Fetch current status from Backend -> Turso --
   const fetchStatus = async () => {
     try {
       const res = await fetch(`http://localhost:5000/api/vault/status?projectId=${projectId}`);
